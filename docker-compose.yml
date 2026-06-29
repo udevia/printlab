@@ -8,8 +8,6 @@ services:
       POSTGRES_USER: printlab_user
       POSTGRES_PASSWORD: printlab_password_secure
       POSTGRES_DB: printlab_db
-    ports:
-      - "5432:5432"
     volumes:
       - printlab_postgres_data:/var/lib/postgresql/data
     healthcheck:
