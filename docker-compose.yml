@@ -22,7 +22,7 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - "3000:3000"
+      - "3005:3000"
     environment:
       - DATABASE_URL=postgresql://printlab_user:printlab_password_secure@db:5432/printlab_db?schema=public
       - NODE_ENV=production
