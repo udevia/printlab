@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String   // Hashed password
+  role      Role     @default(USER)
+  orders    Order[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Product {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  price       Float
+  stock       Int       @default(0)
+  images      String[]  // URLs of images
+  isCustomizable Boolean @default(false) // Whether user can upload an image for sublimation
+  categoryId  String
+  category    Category  @relation(fields: [categoryId], references: [id])
+  orderItems  OrderItem[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Order {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  status        OrderStatus @default(PENDING)
+  totalAmount   Float
+  paymentMethod PaymentMethodType
+  paymentRef    String?   // Reference number for Pago Movil or Transfer
+  items         OrderItem[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  PRODUCTION
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentMethodType {
+  EFECTIVO_BS
+  EFECTIVO_USD
+  PAGO_MOVIL
+}
+
+model OrderItem {
+  id            String    @id @default(cuid())
+  orderId       String
+  order         Order     @relation(fields: [orderId], references: [id])
+  productId     String
+  product       Product   @relation(fields: [productId], references: [id])
+  quantity      Int
+  price         Float
+  customImage   String?   // URL to the uploaded sublimation image
+}
+
+model StoreConfig {
+  id              String   @id @default("default")
+  headerStyle     String   @default("v1")
+  heroTitle       String   @default("Welcome to PrintLab")
+  heroSubtitle    String   @default("Custom Sublimation Products")
+  heroImage       String?
+  showHeroBanner  Boolean  @default(true)
+  updatedAt       DateTime @updatedAt
+}
